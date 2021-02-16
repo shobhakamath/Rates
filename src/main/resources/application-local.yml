@@ -1,0 +1,59 @@
+spring:
+  profiles:
+    active: local
+  h2:
+    console:
+      enabled:  true
+      settings:
+        web-allow-others: true
+  datasource:
+    platform: h2
+    url:  jdbc:h2:mem:rates
+
+  jackson:
+    default-property-inclusion: NON_EMPTY
+  jpa:
+    open-in-view: false
+rates:
+  url:  https://surcharge.free.beeceptor.com/surcharge
+  timeout:
+    read: 10000
+    connection: 3000
+
+security:
+  jwt:
+    token:
+      secret-key: secret-key-for-encryption # string for encrypting tokens
+      expiration: 600000 #10 mins
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      ringBufferSizeInClosedState: 5
+      ringBufferSizeInHalfOpenState: 3
+      waitDurationInOpenState: 10s
+      failureRateThreshold: 50
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.io.IOException
+        - java.util.concurrent.TimeoutException
+        - org.springframework.web.client.ResourceAccessException
+        - org.springframework.web.client.HttpClientErrorException
+  instances:
+    rates:
+      baseConfig: default
+    surcharges:
+      baseConfig: default
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+

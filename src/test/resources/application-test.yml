@@ -1,0 +1,50 @@
+spring:
+  profiles:
+    active: test
+  h2:
+    console:
+      enabled:  true
+  datasource:
+    platform: h2
+    url:  jdbc:h2:mem:rates
+
+  jackson:
+    default-property-inclusion: NON_EMPTY
+  jpa:
+    open-in-view: false
+rates:
+  url:  https://surcharge.free.beeceptor.com/surcharge
+  timeout:
+    read: 10000
+    connection: 10000
+  port: 8080
+security:
+  jwt:
+    token:
+      secret-key: secret-key-for-encryption # string for encrypting tokens
+      expiration: 600000 #10 mins
+resilience4j.circuitbreaker:
+  instances:
+    default:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      minimumNumberOfCalls: 5
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 5s
+      failureRateThreshold: 50
+      eventConsumerBufferSize: 10
+      recordExceptions:
+        - java.util.concurrent.TimeoutException
+        - java.io.IOException
+      ignoreExceptions:
+        - java.lang.IllegalStateException
+
+
+resilience4j:
+  configs:
+    default:
+      cancelRunningFuture: false
+  backends:
+    getRates:
+      baseConfig: default
