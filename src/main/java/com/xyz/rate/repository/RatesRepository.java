@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface RatesRepository extends JpaRepository<Rate, Long> {
     Rate findByRateId(final long rateId);
 
-    @Transactional
+
     int deleteByRateId(final long rateId);
 
 }

@@ -8,8 +8,8 @@
         <version>2.4.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.dp</groupId>
-    <artifactId>rate</artifactId>
+    <groupId>com.xyz</groupId>
+    <artifactId>rates-service</artifactId>
     <version>1.0.0</version>
     <name>rate</name>
     <description>Springboot application for rate calculation</description>

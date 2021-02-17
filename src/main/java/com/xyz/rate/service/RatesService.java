@@ -1,5 +1,8 @@
 package com.xyz.rate.service;
 
+import static org.springframework.transaction.annotation.Isolation.SERIALIZABLE;
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
+
 import com.xyz.rate.configuration.RateConfiguration;
 import com.xyz.rate.dto.RateDTO;
 import com.xyz.rate.dto.RatesSurchargeDTO;
@@ -14,10 +17,10 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
@@ -35,6 +38,7 @@ public class RatesService {
 
     public static final Predicate<Object> IS_NULL = Objects::isNull;
 
+    @Transactional
     public RateDTO createRate(final RateDTO rate) {
         return Optional.of(rate)
             .map(rateRequestMapper::mapFrom)
@@ -67,6 +71,7 @@ public class RatesService {
             .orElseThrow(() -> new InternalServerException("Internal Server Error.Please contact admin"));
     }
 
+    @Transactional
     public boolean deleteRate(final long rateId) {
         int value = ratesRepository.deleteByRateId(rateId);
         if (value == 0) {
@@ -74,13 +79,16 @@ public class RatesService {
         }
         return true;
     }
-
+    @Transactional(propagation = REQUIRES_NEW,
+        isolation = SERIALIZABLE,
+        timeoutString = "${service.transaction.timeout:3}")
     public RatesSurchargeDTO getRatesSurcharge(final long rateId) {
         return RatesSurchargeDTO.builder()
             .ratesDTO(getRates(rateId))
             .surchargeDTO(getSurcharge())
             .build();
     }
+
 
     @CircuitBreaker(name = "rates", fallbackMethod = "fallBackMethod")
     private RateDTO getRates(final long rateId) {

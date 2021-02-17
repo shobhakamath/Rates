@@ -111,7 +111,7 @@ public class RatesServiceTest {
             .rateId(1L)
             .build();
         Mockito.doReturn(rate).when(ratesRepository).findByRateId(anyLong());
-        Mockito.doReturn(null).when(ratesRepository).save(any());
+        Mockito.doReturn(null).when(ratesRepository).saveAndFlush(any(Rate.class));
 
         assertThrows(InternalServerException.class, () -> ratesService.updateRate(rateDTO));
     }

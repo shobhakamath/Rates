@@ -56,4 +56,6 @@ management:
   health:
     circuitbreakers:
       enabled: true
-
+service:
+  transaction:
+    timeout: 5 # seconds
